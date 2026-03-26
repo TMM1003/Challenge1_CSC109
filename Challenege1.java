@@ -50,8 +50,14 @@ public class Challenege1 {
     }
 
     public static void addItemToCart() {
-        // TODO: add the selected item to the cart
-        // TODO: make sure the item appears later in the cart menu
+        if (selectedItem == null) {
+            System.out.println("No item selected.");
+            return;
+        }
+        
+        cart.add(selectedItem);
+        System.out.println("\n" + selectedItem.getName() + " has been added to your cart!");
+        selectedItem = null;
     }
 
     public static void handleSellMenu() {
@@ -74,16 +80,57 @@ public class Challenege1 {
     }
 
     public static void handleCartMenu() {
-        // TODO: display all cart item names and prices
-        // TODO: calculate and display the total price
-        // TODO: let the user choose to checkout
-        // TODO: provide an option to return to the main menu
+        boolean inCartMenu = true;
+        
+        while (inCartMenu) {
+            System.out.println("\n===== CART MENU =====");
+            
+            if (cart.isEmpty()) {
+                System.out.println("Your cart is empty.");
+            } else {
+                System.out.println("\nItems in Cart:");
+                double total = 0;
+                for (int i = 0; i < cart.size(); i++) {
+                    Item item = cart.get(i);
+                    System.out.printf("%d. %s - $%.2f\n", i + 1, item.getName(), item.getPrice());
+                    total += item.getPrice();
+                }
+                System.out.printf("\nTotal: $%.2f\n", total);
+            }
+            
+            System.out.println("\nOptions:");
+            System.out.println("1. Checkout");
+            System.out.println("2. Return to Main Menu");
+            System.out.print("Choose an option: ");
+            String choice = scanner.nextLine().trim();
+            
+            if (choice.equals("1")) {
+                checkoutCart();
+                inCartMenu = false;
+            } else if (choice.equals("2")) {
+                inCartMenu = false;
+            } else {
+                System.out.println("Invalid choice. Please try again.");
+            }
+        }
     }
 
     public static void checkoutCart() {
-        // TODO: purchase all items currently in the cart
-        // TODO: remove purchased items from the buy menu
-        // TODO: clear the cart after checkout
+        if (cart.isEmpty()) {
+            System.out.println("Your cart is empty. Nothing to purchase.");
+            return;
+        }
+        
+        double totalCost = 0;
+        for (Item item : cart) {
+            totalCost += item.getPrice();
+            items.remove(item);
+        }
+        
+        System.out.println("\n===== CHECKOUT =====");
+        System.out.printf("Purchase successful! Total spent: $%.2f\n", totalCost);
+        cart.clear();
+        System.out.println("Items have been removed from the marketplace.");
     }
 
     public static void logoutUser() {
