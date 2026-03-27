@@ -1,5 +1,8 @@
-public class Challenege1 {
+import java.util.Scanner;
 
+public class Challenege1 {
+String [] emails;
+String [] passwords;
     public static void main(String[] args) {
         // TODO: call setup methods
         // TODO: show welcome message and ASCII art
@@ -9,23 +12,71 @@ public class Challenege1 {
 
     public static void showWelcomeMessage() {
         // TODO: print a fun qBay welcome message
+        System.out.println("Welcome to Qbay! You can buy or sell anything you want! ");
         // TODO: print ASCII art
+        System.out.println("             U _____ u  _        ____   U  ___ u  __  __  U _____ u      _____   U  ___ u       ___     ____      _      __   __  _    \r\n" + //
+                        " __        __\\| ___\"|/ |\"|    U /\"___|   \\/\"_ \\/U|' \\/ '|u\\| ___\"|/     |_ \" _|   \\/\"_ \\/      / \" \\ U | __\")uU  /\"\\  u  \\ \\ / /U|\"|u  \r\n" + //
+                        " \\\"\\      /\"/ |  _|\" U | | u  \\| | u     | | | |\\| |\\/| |/ |  _|\"         | |     | | | |     | |\"| | \\|  _ \\/ \\/ _ \\/    \\ V / \\| |/  \r\n" + //
+                        " /\\ \\ /\\ / /\\ | |___  \\| |/__  | |/__.-,_| |_| | | |  | |  | |___        /| |\\.-,_| |_| |    /| |_| |\\ | |_) | / ___ \\   U_|\"|_u |_|   \r\n" + //
+                        "U  \\ V  V /  U|_____|  |_____|  \\____|\\_)-\\___/  |_|  |_|  |_____|      u |_|U \\_)-\\___/     U \\__\\_\\u |____/ /_/   \\_\\    |_|   (_)   \r\n" + //
+                        ".-,_\\ /\\ /_,-.<<   >>  //  \\\\  _// \\\\      \\\\   <<,-,,-.   <<   >>      _// \\\\_     \\\\          \\\\//  _|| \\\\_  \\\\    >>.-,//|(_  |||_  \r\n" + //
+                        " \\_)-'  '-(_/(__) (__)(_\")(\"_)(__)(__)    (__)   (./  \\.) (__) (__)    (__) (__)   (__)        (_(__)(__) (__)(__)  (__)\\_) (__)(__)_) ");
     }
 
-    public static void loadHardcodedAccounts() {
+    public void loadHardcodedAccounts() {
         // TODO: create a few Quinnipiac student accounts with hardcoded emails/passwords
+        String [] hardEmails = {"John.Smith@quinnipiac.edu", "Jane.Doe@quinnipiac.edu", "Carl.Hansen@quinnipiac.edu", "Jimmy.Darren@quinnipiac.edu", "Greg.Paul@quinnipiac.edu"};
+        String [] hardPasswords = {"FishyGalore123", "SecretPassword!", "CSC109CHALLENGE", "SuperOriginalPassword", "FloatyTheDog1987"};
+
+        this.emails = hardEmails;
+        this.passwords = hardPasswords;
     }
 
     public static void loadStarterItems() {
         // TODO: create at least 5 starter items for the buy menu
     }
 
-    public static boolean loginUser() {
+    public boolean loginUser() {
         // TODO: prompt for Quinnipiac email
         // TODO: prompt for password
         // TODO: validate against hardcoded accounts
         // TODO: allow at most 3 failed attempts
         // TODO: lock the user out after 3 failures
+        
+        int count = 0;
+        Scanner in = new Scanner (System.in);
+
+        
+        System.out.println("Enter your email: ");
+        String userInput = in.nextLine();
+        
+        System.out.println("Enter your password: ");
+        String passwordInput = in.nextLine();
+
+        for (int i = 0; i < emails.length; i++) {
+            if (userInput.equals(emails[i])) {
+                if (passwordInput.equals(passwords[i])) {
+                    return true;
+                }
+            }
+        }
+        while ((count < 3)) {
+            System.out.println("Incorrect email or password. ");
+            count ++;
+            System.out.println("Enter your email again: ");
+            userInput = in.nextLine();
+            
+            System.out.println("Enter your password again: ");
+            passwordInput = in.nextLine();
+
+            for (int i = 0; i < emails.length; i++) {
+                if (userInput.equals(emails[i])) {
+                    if (passwordInput.equals(passwords[i])) {
+                        return true;
+                    }
+                }
+            }
+        }
         return false;
     }
 
@@ -88,7 +139,9 @@ public class Challenege1 {
 
     public static void logoutUser() {
         // TODO: print a thank-you message
+        System.out.println("Thank you for shopping at QBay! ");
         // TODO: tell the user they have successfully logged out
+        System.out.println("You have been successfully logged out. ");
         // TODO: exit the program
     }
 }
