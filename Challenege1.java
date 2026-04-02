@@ -187,6 +187,7 @@ String [] passwords;
     public static void logoutUser() {
         // TODO: print a thank-you message
         System.out.println("Thank you for shopping at QBay! ");
+        System.out.println("If this is on GitHub, its working!");
         // TODO: tell the user they have successfully logged out
         System.out.println("You have been successfully logged out. ");
         // TODO: exit the program
