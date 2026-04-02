@@ -1,8 +1,17 @@
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Scanner;
 
 public class Challenege1 {
-String [] emails;
-String [] passwords;
+    private static final String[] STARTER_ACCOUNT_KEYS = {"JOHN_SMITH", "JANE_DOE", "CARL_HANSEN", "JIMMY_DARREN", "GREG_PAUL"};
+
+    String[] emails;
+    String[] passwords;
+
     public static void main(String[] args) {
     }
     public static void showWelcomeMessage() {
@@ -17,17 +26,103 @@ String [] passwords;
     }
 
     public void loadHardcodedAccounts() {
-        String [] hardEmails = {"John.Smith@quinnipiac.edu", "Jane.Doe@quinnipiac.edu", "Carl.Hansen@quinnipiac.edu", "Jimmy.Darren@quinnipiac.edu", "Greg.Paul@quinnipiac.edu"};
-        String [] hardPasswords = {"FishyGalore123", "SecretPassword!", "CSC109CHALLENGE", "SuperOriginalPassword", "FloatyTheDog1987"};
+        this.emails = loadEmails();
+        this.passwords = loadPasswords();
+    }
 
-        this.emails = hardEmails;
-        this.passwords = hardPasswords;
+    private static String[] loadEmails() {
+        Map<String, String> dotEnvValues = readDotEnvFile();
+        String[] loadedEmails = new String[STARTER_ACCOUNT_KEYS.length];
+
+        for (int i = 0; i < STARTER_ACCOUNT_KEYS.length; i++) {
+            String envKey = buildEmailEnvKey(STARTER_ACCOUNT_KEYS[i]);
+            String configuredEmail = readConfigValue(envKey, dotEnvValues);
+
+            if (configuredEmail == null || configuredEmail.isBlank()) {
+                configuredEmail = buildDemoEmail(STARTER_ACCOUNT_KEYS[i]);
+            }
+
+            loadedEmails[i] = configuredEmail;
+        }
+
+        return loadedEmails;
+    }
+
+    private String[] loadPasswords() {
+        Map<String, String> dotEnvValues = readDotEnvFile();
+        String[] loadedPasswords = new String[STARTER_ACCOUNT_KEYS.length];
+
+        for (int i = 0; i < STARTER_ACCOUNT_KEYS.length; i++) {
+            String envKey = buildPasswordEnvKey(STARTER_ACCOUNT_KEYS[i]);
+            String configuredPassword = readConfigValue(envKey, dotEnvValues);
+
+            if (configuredPassword == null || configuredPassword.isBlank()) {
+                configuredPassword = buildDemoPassword(STARTER_ACCOUNT_KEYS[i]);
+            }
+
+            loadedPasswords[i] = configuredPassword;
+        }
+
+        return loadedPasswords;
+    }
+
+    private static Map<String, String> readDotEnvFile() {
+        Map<String, String> dotEnvValues = new HashMap<>();
+        Path envPath = Paths.get(".env");
+
+        if (!Files.exists(envPath)) {
+            return dotEnvValues;
+        }
+
+        try {
+            for (String line : Files.readAllLines(envPath)) {
+                String trimmedLine = line.trim();
+                if (trimmedLine.isEmpty() || trimmedLine.startsWith("#")) {
+                    continue;
+                }
+
+                String[] keyValuePair = trimmedLine.split("=", 2);
+                if (keyValuePair.length == 2) {
+                    dotEnvValues.put(keyValuePair[0].trim(), keyValuePair[1].trim());
+                }
+            }
+        } catch (IOException exception) {
+            System.out.println("Could not read .env file. Falling back to demo passwords.");
+        }
+
+        return dotEnvValues;
+    }
+
+    private static String readConfigValue(String envKey, Map<String, String> dotEnvValues) {
+        String configuredValue = System.getenv(envKey);
+
+        if (configuredValue == null || configuredValue.isBlank()) {
+            configuredValue = dotEnvValues.get(envKey);
+        }
+
+        return configuredValue;
+    }
+
+    private static String buildEmailEnvKey(String accountKey) {
+        return accountKey + "_EMAIL";
+    }
+
+    private static String buildPasswordEnvKey(String accountKey) {
+        return accountKey + "_PASSWORD";
+    }
+
+    private static String buildDemoEmail(String accountKey) {
+        return accountKey.toLowerCase().replace("_", ".") + "@example.local";
+    }
+
+    private String buildDemoPassword(String accountKey) {
+        return accountKey.toLowerCase().replace("_", "") + "_demo";
     }
 
 
     public boolean loginUser() {
         int count = 0;
-        Scanner in = new Scanner (System.in);
+        Scanner in = new Scanner(System.in);
 
         
         System.out.println("Enter your email: ");
@@ -73,7 +168,7 @@ String [] passwords;
         String[] itemNames = {"MacBook Air", "Dorm Mini Fridge", "Calculus Textbook", "Bike Lock", "Noise-Cancelling Headphones"};
         String[] itemCategories = {"Electronics", "Appliances", "Books", "Accessories", "Electronics"};
         String[] sellerNames = {"John Smith", "Jane Doe", "Carl Hansen", "Jimmy Darren", "Greg Paul"};
-        String[] sellerEmails = {"John.Smith@quinnipiac.edu", "Jane.Doe@quinnipiac.edu", "Carl.Hansen@quinnipiac.edu", "Jimmy.Darren@quinnipiac.edu", "Greg.Paul@quinnipiac.edu"};
+        String[] sellerEmails = loadEmails();
         double[] itemPrices = {799.99, 120.00, 65.50, 18.99, 149.99};
 
         System.out.println("\nItems for Sale:");
@@ -145,21 +240,63 @@ String [] passwords;
     }
 
     public static void handleCartMenu() {
-        // TODO: display all cart item names and prices
-        // TODO: calculate and display the total price
-        // TODO: let the user choose to checkout
-        // TODO: provide an option to return to the main menu
+        boolean inCartMenu = true;
+        
+        while (inCartMenu) {
+            System.out.println("\n===== CART MENU =====");
+            
+            if (cart.isEmpty()) {
+                System.out.println("Your cart is empty.");
+            } else {
+                System.out.println("\nItems in Cart:");
+                double total = 0;
+                for (int i = 0; i < cart.size(); i++) {
+                    Item item = cart.get(i);
+                    System.out.printf("%d. %s - $%.2f\n", i + 1, item.getName(), item.getPrice());
+                    total += item.getPrice();
+                }
+                System.out.printf("\nTotal: $%.2f\n", total);
+            }
+            
+            System.out.println("\nOptions:");
+            System.out.println("1. Checkout");
+            System.out.println("2. Return to Main Menu");
+            System.out.print("Choose an option: ");
+            String choice = scanner.nextLine().trim();
+            
+            if (choice.equals("1")) {
+                checkoutCart();
+                inCartMenu = false;
+            } else if (choice.equals("2")) {
+                inCartMenu = false;
+            } else {
+                System.out.println("Invalid choice. Please try again.");
+            }
+        }
     }
 
     public static void checkoutCart() {
-        // TODO: purchase all items currently in the cart
-        // TODO: remove purchased items from the buy menu
-        // TODO: clear the cart after checkout
+        if (cart.isEmpty()) {
+            System.out.println("Your cart is empty. Nothing to purchase.");
+            return;
+        }
+        
+        double totalCost = 0;
+        for (Item item : cart) {
+            totalCost += item.getPrice();
+            items.remove(item);
+        }
+        
+        System.out.println("\n===== CHECKOUT =====");
+        System.out.printf("Purchase successful! Total spent: $%.2f\n", totalCost);
+        cart.clear();
+        System.out.println("Items have been removed from the marketplace.");
     }
 
     public static void logoutUser() {
         // TODO: print a thank-you message
         System.out.println("Thank you for shopping at QBay! ");
+        System.out.println("If this is on GitHub, its working!");
         // TODO: tell the user they have successfully logged out
         System.out.println("You have been successfully logged out. ");
         // TODO: exit the program
