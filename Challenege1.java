@@ -219,24 +219,71 @@ public class Challenege1 {
      public static String[] cartItemNames = new String[100];
      public static double[] cartItemPrices = new double[100];
      public static int cartItemCount = 0;
+
+     public static String[] sellItemNames = new String[100];
+     public static String[] sellItemCategories = new String[100];
+     public static double[] sellItemPrices = new double[100];
+     public static int sellItemCount = 0;
     
     public static void handleSellMenu() {
-        // TODO: show options to view current items for sale or add a new item
-        // TODO: provide an option to return to the main menu
+        Scanner in = new Scanner(System.in);
+
+        while (true) { 
+            System.out.println("\n===== SELL MENU =====");
+            System.out.println("1. View your items");
+            System.out.println("2. Add item");
+            System.out.println("3. Back to main menu");
+
+            String choice = in.nextLine();
+
+            if (choice.equals("1")) {
+                showCurrentUserListings();
+            }
+            else if (choice.equals("2")) {
+                addNewItemForSale();
+            }
+            else if (choice.equals("3")) {
+                break;
+            }
+            else {
+                System.out.println("Invalid choice.");
+            }
+        }
+    
     }
 
     public static void showCurrentUserListings() {
-        // TODO: display the logged-in user's item names
-        // TODO: display each item's category
-        // TODO: display each item's price
+        System.out.println("\n===== YOUR ITEMS FOR SALE =====");
+
+        if (sellItemCount == 0) {
+            System.out.println("No items listed.");
+            return;
+        }
+
+        for (int i = 0; i < sellItemCount; i++) {
+            System.out.println((i + 1) + ". Name: " + sellItemNames[i] + " | Category: " + sellItemCategories[i] + " | Price: $" + sellItemPrices[i]);
+        }
     }
 
     public static void addNewItemForSale() {
-        // TODO: prompt for item name
-        // TODO: prompt for item category
-        // TODO: prompt for item price
-        // TODO: add the new item to the system
-        // TODO: make sure it appears in the user's listings
+        Scanner in = new Scanner(System.in);
+
+        System.out.print("Enter item name: ");
+        String name = in.nextLine();
+
+        System.out.print("Enter category: ");
+        String category = in.nextLine();
+
+        System.out.print("Enter price: ");
+        double price = in.nextDouble();
+        in.nextLine();
+
+        sellItemNames[sellItemCount] = name;
+        sellItemCategories[sellItemCount] = category;
+        sellItemPrices[sellItemCount] = price;
+        sellItemCount++;
+
+        System.out.println("Item added!");
     }
 
     public static void handleCartMenu() {
