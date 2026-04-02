@@ -1,8 +1,15 @@
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Scanner;
 
 public class Challenege1 {
-String [] emails;
-String [] passwords;
+    String[] emails;
+    String[] passwords;
+
     public static void main(String[] args) {
     }
     public static void showWelcomeMessage() {
@@ -17,17 +24,75 @@ String [] passwords;
     }
 
     public void loadHardcodedAccounts() {
-        String [] hardEmails = {"John.Smith@quinnipiac.edu", "Jane.Doe@quinnipiac.edu", "Carl.Hansen@quinnipiac.edu", "Jimmy.Darren@quinnipiac.edu", "Greg.Paul@quinnipiac.edu"};
-        String [] hardPasswords = {"FishyGalore123", "SecretPassword!", "CSC109CHALLENGE", "SuperOriginalPassword", "FloatyTheDog1987"};
+        String[] hardEmails = {"John.Smith@quinnipiac.edu", "Jane.Doe@quinnipiac.edu", "Carl.Hansen@quinnipiac.edu", "Jimmy.Darren@quinnipiac.edu", "Greg.Paul@quinnipiac.edu"};
 
         this.emails = hardEmails;
-        this.passwords = hardPasswords;
+        this.passwords = loadPasswords(hardEmails);
+    }
+
+    private String[] loadPasswords(String[] hardEmails) {
+        Map<String, String> dotEnvValues = readDotEnvFile();
+        String[] loadedPasswords = new String[hardEmails.length];
+
+        for (int i = 0; i < hardEmails.length; i++) {
+            String envKey = buildPasswordEnvKey(hardEmails[i]);
+            String configuredPassword = System.getenv(envKey);
+
+            if (configuredPassword == null || configuredPassword.isBlank()) {
+                configuredPassword = dotEnvValues.get(envKey);
+            }
+
+            if (configuredPassword == null || configuredPassword.isBlank()) {
+                configuredPassword = buildDemoPassword(hardEmails[i]);
+            }
+
+            loadedPasswords[i] = configuredPassword;
+        }
+
+        return loadedPasswords;
+    }
+
+    private Map<String, String> readDotEnvFile() {
+        Map<String, String> dotEnvValues = new HashMap<>();
+        Path envPath = Paths.get(".env");
+
+        if (!Files.exists(envPath)) {
+            return dotEnvValues;
+        }
+
+        try {
+            for (String line : Files.readAllLines(envPath)) {
+                String trimmedLine = line.trim();
+                if (trimmedLine.isEmpty() || trimmedLine.startsWith("#")) {
+                    continue;
+                }
+
+                String[] keyValuePair = trimmedLine.split("=", 2);
+                if (keyValuePair.length == 2) {
+                    dotEnvValues.put(keyValuePair[0].trim(), keyValuePair[1].trim());
+                }
+            }
+        } catch (IOException exception) {
+            System.out.println("Could not read .env file. Falling back to demo passwords.");
+        }
+
+        return dotEnvValues;
+    }
+
+    private String buildPasswordEnvKey(String email) {
+        String emailPrefix = email.substring(0, email.indexOf('@')).replace(".", "_").toUpperCase();
+        return emailPrefix + "_PASSWORD";
+    }
+
+    private String buildDemoPassword(String email) {
+        String emailPrefix = email.substring(0, email.indexOf('@')).replace(".", "").toLowerCase();
+        return emailPrefix + "_demo";
     }
 
 
     public boolean loginUser() {
         int count = 0;
-        Scanner in = new Scanner (System.in);
+        Scanner in = new Scanner(System.in);
 
         
         System.out.println("Enter your email: ");
