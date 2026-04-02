@@ -4,16 +4,9 @@ public class Challenege1 {
 String [] emails;
 String [] passwords;
     public static void main(String[] args) {
-        // TODO: call setup methods
-        // TODO: show welcome message and ASCII art
-        // TODO: run login flow
-        // TODO: if login succeeds, show the main menu until the user logs out
     }
-
     public static void showWelcomeMessage() {
-        // TODO: print a fun qBay welcome message
         System.out.println("Welcome to Qbay! You can buy or sell anything you want! ");
-        // TODO: print ASCII art
         System.out.println("             U _____ u  _        ____   U  ___ u  __  __  U _____ u      _____   U  ___ u       ___     ____      _      __   __  _    \r\n" + //
                         " __        __\\| ___\"|/ |\"|    U /\"___|   \\/\"_ \\/U|' \\/ '|u\\| ___\"|/     |_ \" _|   \\/\"_ \\/      / \" \\ U | __\")uU  /\"\\  u  \\ \\ / /U|\"|u  \r\n" + //
                         " \\\"\\      /\"/ |  _|\" U | | u  \\| | u     | | | |\\| |\\/| |/ |  _|\"         | |     | | | |     | |\"| | \\|  _ \\/ \\/ _ \\/    \\ V / \\| |/  \r\n" + //
@@ -24,7 +17,6 @@ String [] passwords;
     }
 
     public void loadHardcodedAccounts() {
-        // TODO: create a few Quinnipiac student accounts with hardcoded emails/passwords
         String [] hardEmails = {"John.Smith@quinnipiac.edu", "Jane.Doe@quinnipiac.edu", "Carl.Hansen@quinnipiac.edu", "Jimmy.Darren@quinnipiac.edu", "Greg.Paul@quinnipiac.edu"};
         String [] hardPasswords = {"FishyGalore123", "SecretPassword!", "CSC109CHALLENGE", "SuperOriginalPassword", "FloatyTheDog1987"};
 
@@ -32,17 +24,8 @@ String [] passwords;
         this.passwords = hardPasswords;
     }
 
-    public static void loadStarterItems() {
-        // TODO: create at least 5 starter items for the buy menu
-    }
 
     public boolean loginUser() {
-        // TODO: prompt for Quinnipiac email
-        // TODO: prompt for password
-        // TODO: validate against hardcoded accounts
-        // TODO: allow at most 3 failed attempts
-        // TODO: lock the user out after 3 failures
-        
         int count = 0;
         Scanner in = new Scanner (System.in);
 
@@ -87,17 +70,48 @@ String [] passwords;
     }
 
     public static void handleBuyMenu() {
-        // TODO: display all items for sale by name in a neat format
-        // TODO: let the user view details for a selected item
-        // TODO: let the user add a selected item to the cart
-        // TODO: provide an option to return to the main menu
-    }
+        String[] itemNames = {"MacBook Air", "Dorm Mini Fridge", "Calculus Textbook", "Bike Lock", "Noise-Cancelling Headphones"};
+        String[] itemCategories = {"Electronics", "Appliances", "Books", "Accessories", "Electronics"};
+        String[] sellerNames = {"John Smith", "Jane Doe", "Carl Hansen", "Jimmy Darren", "Greg Paul"};
+        String[] sellerEmails = {"John.Smith@quinnipiac.edu", "Jane.Doe@quinnipiac.edu", "Carl.Hansen@quinnipiac.edu", "Jimmy.Darren@quinnipiac.edu", "Greg.Paul@quinnipiac.edu"};
+        double[] itemPrices = {799.99, 120.00, 65.50, 18.99, 149.99};
 
-    public static void showItemDetails() {
-        // TODO: display the selected item's name
-        // TODO: display the selected item's category
-        // TODO: display seller first name, last name, and Quinnipiac email
-        // TODO: display the selected item's price
+        System.out.println("\nItems for Sale:");
+        for (int i = 0; i < itemNames.length; i++) {
+            System.out.printf("%d. %s%n", i + 1, itemNames[i]);
+        }
+        Scanner in = new Scanner(System.in);
+        System.out.print("Select an item number to view details: ");
+        int selection = in.nextInt();
+
+        if (selection >= 1 && selection <= itemNames.length) {
+            showItemDetails(selection - 1, itemNames, itemCategories, sellerNames, sellerEmails, itemPrices);
+        } else {
+            System.out.println("Invalid item selection.");
+        return;
+        }
+        System.out.print("Add this item to your cart? (yes/no): ");
+        in.nextLine();
+        String addToCartChoice = in.nextLine();
+
+        if (addToCartChoice.equalsIgnoreCase("yes") || addToCartChoice.equalsIgnoreCase("y")) {
+            addItemToCart(itemNames[selection - 1], itemPrices[selection - 1]);
+            System.out.println(itemNames[selection - 1] + " added to cart.");
+        }
+        
+         System.out.print("Enter M to return to the main menu: ");
+        String returnChoice = in.nextLine();
+        if (returnChoice.equalsIgnoreCase("m")) {
+            showMainMenu();
+            return;
+        }
+    }
+    public static void showItemDetails(int itemIndex, String[] itemNames, String[] itemCategories, String[] sellerNames, String[] sellerEmails, double[] itemPrices) {
+        System.out.println("\nItem Details:");
+        System.out.println("Name: " + itemNames[itemIndex]);
+        System.out.println("Category: " + itemCategories[itemIndex]);
+        System.out.println("Seller: " + sellerNames[itemIndex] + " (" + sellerEmails[itemIndex] + ")");
+        System.out.printf("Price: $%.2f%n", itemPrices[itemIndex]);
     }
 
     public static void addItemToCart() {
@@ -111,6 +125,10 @@ String [] passwords;
         selectedItem = null;
     }
 
+     public static String[] cartItemNames = new String[100];
+     public static double[] cartItemPrices = new double[100];
+     public static int cartItemCount = 0;
+    
     public static void handleSellMenu() {
         // TODO: show options to view current items for sale or add a new item
         // TODO: provide an option to return to the main menu
