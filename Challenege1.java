@@ -7,6 +7,8 @@ import java.util.Map;
 import java.util.Scanner;
 
 public class Challenege1 {
+    private static final String[] STARTER_ACCOUNT_KEYS = {"JOHN_SMITH", "JANE_DOE", "CARL_HANSEN", "JIMMY_DARREN", "GREG_PAUL"};
+
     String[] emails;
     String[] passwords;
 
@@ -24,26 +26,38 @@ public class Challenege1 {
     }
 
     public void loadHardcodedAccounts() {
-        String[] hardEmails = {"John.Smith@quinnipiac.edu", "Jane.Doe@quinnipiac.edu", "Carl.Hansen@quinnipiac.edu", "Jimmy.Darren@quinnipiac.edu", "Greg.Paul@quinnipiac.edu"};
-
-        this.emails = hardEmails;
-        this.passwords = loadPasswords(hardEmails);
+        this.emails = loadEmails();
+        this.passwords = loadPasswords();
     }
 
-    private String[] loadPasswords(String[] hardEmails) {
+    private static String[] loadEmails() {
         Map<String, String> dotEnvValues = readDotEnvFile();
-        String[] loadedPasswords = new String[hardEmails.length];
+        String[] loadedEmails = new String[STARTER_ACCOUNT_KEYS.length];
 
-        for (int i = 0; i < hardEmails.length; i++) {
-            String envKey = buildPasswordEnvKey(hardEmails[i]);
-            String configuredPassword = System.getenv(envKey);
+        for (int i = 0; i < STARTER_ACCOUNT_KEYS.length; i++) {
+            String envKey = buildEmailEnvKey(STARTER_ACCOUNT_KEYS[i]);
+            String configuredEmail = readConfigValue(envKey, dotEnvValues);
 
-            if (configuredPassword == null || configuredPassword.isBlank()) {
-                configuredPassword = dotEnvValues.get(envKey);
+            if (configuredEmail == null || configuredEmail.isBlank()) {
+                configuredEmail = buildDemoEmail(STARTER_ACCOUNT_KEYS[i]);
             }
 
+            loadedEmails[i] = configuredEmail;
+        }
+
+        return loadedEmails;
+    }
+
+    private String[] loadPasswords() {
+        Map<String, String> dotEnvValues = readDotEnvFile();
+        String[] loadedPasswords = new String[STARTER_ACCOUNT_KEYS.length];
+
+        for (int i = 0; i < STARTER_ACCOUNT_KEYS.length; i++) {
+            String envKey = buildPasswordEnvKey(STARTER_ACCOUNT_KEYS[i]);
+            String configuredPassword = readConfigValue(envKey, dotEnvValues);
+
             if (configuredPassword == null || configuredPassword.isBlank()) {
-                configuredPassword = buildDemoPassword(hardEmails[i]);
+                configuredPassword = buildDemoPassword(STARTER_ACCOUNT_KEYS[i]);
             }
 
             loadedPasswords[i] = configuredPassword;
@@ -52,7 +66,7 @@ public class Challenege1 {
         return loadedPasswords;
     }
 
-    private Map<String, String> readDotEnvFile() {
+    private static Map<String, String> readDotEnvFile() {
         Map<String, String> dotEnvValues = new HashMap<>();
         Path envPath = Paths.get(".env");
 
@@ -79,14 +93,30 @@ public class Challenege1 {
         return dotEnvValues;
     }
 
-    private String buildPasswordEnvKey(String email) {
-        String emailPrefix = email.substring(0, email.indexOf('@')).replace(".", "_").toUpperCase();
-        return emailPrefix + "_PASSWORD";
+    private static String readConfigValue(String envKey, Map<String, String> dotEnvValues) {
+        String configuredValue = System.getenv(envKey);
+
+        if (configuredValue == null || configuredValue.isBlank()) {
+            configuredValue = dotEnvValues.get(envKey);
+        }
+
+        return configuredValue;
     }
 
-    private String buildDemoPassword(String email) {
-        String emailPrefix = email.substring(0, email.indexOf('@')).replace(".", "").toLowerCase();
-        return emailPrefix + "_demo";
+    private static String buildEmailEnvKey(String accountKey) {
+        return accountKey + "_EMAIL";
+    }
+
+    private static String buildPasswordEnvKey(String accountKey) {
+        return accountKey + "_PASSWORD";
+    }
+
+    private static String buildDemoEmail(String accountKey) {
+        return accountKey.toLowerCase().replace("_", ".") + "@example.local";
+    }
+
+    private String buildDemoPassword(String accountKey) {
+        return accountKey.toLowerCase().replace("_", "") + "_demo";
     }
 
 
@@ -138,7 +168,7 @@ public class Challenege1 {
         String[] itemNames = {"MacBook Air", "Dorm Mini Fridge", "Calculus Textbook", "Bike Lock", "Noise-Cancelling Headphones"};
         String[] itemCategories = {"Electronics", "Appliances", "Books", "Accessories", "Electronics"};
         String[] sellerNames = {"John Smith", "Jane Doe", "Carl Hansen", "Jimmy Darren", "Greg Paul"};
-        String[] sellerEmails = {"John.Smith@quinnipiac.edu", "Jane.Doe@quinnipiac.edu", "Carl.Hansen@quinnipiac.edu", "Jimmy.Darren@quinnipiac.edu", "Greg.Paul@quinnipiac.edu"};
+        String[] sellerEmails = loadEmails();
         double[] itemPrices = {799.99, 120.00, 65.50, 18.99, 149.99};
 
         System.out.println("\nItems for Sale:");
